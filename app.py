@@ -6,7 +6,16 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
-
+def to_0_100(s):
+    s = pd.to_numeric(s, errors="coerce")
+    s = s.dropna()
+    if len(s) < 2:
+        return s
+    lo, hi = float(s.min()), float(s.max())
+    if hi == lo:
+        return s * 0 + 50.0
+    return (s - lo) / (hi - lo) * 100.0
+    
 # Optional (for FRED series). If not installed, app will still run with Yahoo-only mode.
 try:
     from pandas_datareader import data as pdr
@@ -404,11 +413,16 @@ with tab_raw:
         plot_df = align_series(plot_series)
         plot_df = plot_df[plot_df.index >= pd.to_datetime(start_display)]
 
-        fig = go.Figure()
-        for c in plot_df.columns:
-            fig.add_trace(go.Scatter(x=plot_df.index, y=plot_df[c], mode="lines", name=c))
-        fig.update_layout(height=560, margin=dict(l=10, r=10, t=35, b=10))
-        st.plotly_chart(fig, use_container_width=True)
+fig = go.Figure()
+
+for c in plot_df.columns:
+    s_norm = to_0_100(plot_df[c])
+    if len(s_norm) == 0:
+        continue
+    fig.add_trace(go.Scatter(x=s_norm.index, y=s_norm, mode="lines", name=f"{c} (0-100)"))
+
+fig.update_layout(height=560, margin=dict(l=10, r=10, t=35, b=10))
+st.plotly_chart(fig, use_container_width=True)
 
     st.caption("Tip: 금리/유동성/스프레드가 필요하면 FRED 데이터가 더 정확합니다.")
 
