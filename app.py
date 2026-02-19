@@ -233,10 +233,15 @@ else:
     # Heuristic conversion: ^TNX often = yield*10
     if "TNX" in series:
         tnx = series["TNX"].copy()
-        if tnx.median() > 20:
-            series["US10Y_%"] = tnx / 10.0
-        else:
-            series["US10Y_%"] = tnx
+if tnx is not None and not tnx.empty:
+    tnx_clean = tnx.dropna()
+    if not tnx_clean.empty and tnx_clean.median() > 20:
+        series["US10Y_%"] = tnx_clean / 10.0
+    else:
+        series["US10Y_%"] = tnx_clean
+else:
+    # 데이터 없으면 10년물 제외하고 진행
+    pass
 
 # Credit spreads
 if "HY Spread (BAMLH0A0HYM2)" in fred:
