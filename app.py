@@ -231,23 +231,20 @@ if "US10Y (DGS10)" in fred:
     series["US10Y_%"] = fred["US10Y (DGS10)"]
 else:
     # Heuristic conversion: ^TNX often = yield*10
-if "TNX" in series:
-    tnx = series["TNX"]
+    if "TNX" in series:
+        tnx = series["TNX"]
 
-    # tnx가 DataFrame으로 들어오는 경우 방어
-    if isinstance(tnx, pd.DataFrame):
-        if "Close" in tnx.columns:
-            tnx = tnx["Close"]
-        else:
-            tnx = tnx.iloc[:, 0]
+        if isinstance(tnx, pd.DataFrame):
+            if "Close" in tnx.columns:
+                tnx = tnx["Close"]
+            else:
+                tnx = tnx.iloc[:, 0]
 
-    # 숫자로 강제 변환 후 결측 제거
-    tnx = pd.to_numeric(tnx, errors="coerce").dropna()
+        tnx = pd.to_numeric(tnx, errors="coerce").dropna()
 
-    if len(tnx) > 0:
-        med = float(tnx.median())
-        series["US10Y_%"] = (tnx / 10.0) if med > 20 else tnx
-
+        if len(tnx) > 0:
+            med = float(tnx.median())
+            series["US10Y_%"] = (tnx / 10.0) if med > 20.0 else tnx
 
 # Credit spreads
 if "HY Spread (BAMLH0A0HYM2)" in fred:
