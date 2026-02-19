@@ -350,7 +350,8 @@ risk_smooth = risk_smooth.clip(0, 100)
 
 # Latest snapshot
 latest_date = risk_smooth.dropna().index.max()
-latest_risk = float(risk_smooth.dropna().iloc[-1]) if latest_date is not None else np.nan
+_r = risk_smooth.dropna()
+latest_risk = float(_r.iloc[-1]) if (latest_date is not None and len(_r) > 0) else np.nan
 
 # =========================
 # Tabs
