@@ -227,21 +227,17 @@ if PDR_OK:
 
 # Prefer FRED DGS10 over TNX if available
 if "US10Y (DGS10)" in fred:
-    # Convert to % (already in %)
     series["US10Y_%"] = fred["US10Y (DGS10)"]
 else:
-    # Heuristic conversion: ^TNX often = yield*10
+    pass  # <= 문법 오류 방지용
+
+# TNX fallback (FRED 10Y 없을 때만)
+if "US10Y_% " not in series and "US10Y_%" not in series:
     if "TNX" in series:
         tnx = series["TNX"]
-
         if isinstance(tnx, pd.DataFrame):
-            if "Close" in tnx.columns:
-                tnx = tnx["Close"]
-            else:
-                tnx = tnx.iloc[:, 0]
-
+            tnx = tnx["Close"] if "Close" in tnx.columns else tnx.iloc[:, 0]
         tnx = pd.to_numeric(tnx, errors="coerce").dropna()
-
         if len(tnx) > 0:
             med = float(tnx.median())
             series["US10Y_%"] = (tnx / 10.0) if med > 20.0 else tnx
