@@ -424,7 +424,7 @@ for c in plot_df.columns:
 fig.update_layout(height=560, margin=dict(l=10, r=10, t=35, b=10))
 st.plotly_chart(fig, use_container_width=True)
 
-    st.caption("Tip: 금리/유동성/스프레드가 필요하면 FRED 데이터가 더 정확합니다.")
+st.caption("Tip: 금리/유동성/스프레드가 필요하면 FRED 데이터가 더 정확합니다.")
 
 # ---- RISK ----
 with tab_risk:
