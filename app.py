@@ -357,10 +357,15 @@ risk_smooth = risk_index.rolling(int(smooth_days)).mean()
 # Clip
 risk_smooth = risk_smooth.clip(0, 100)
 
-# Latest snapshot
-latest_date = risk_smooth.dropna().index.max()
-_r = risk_smooth.dropna()
-latest_risk = float(_r.iloc[-1]) if (latest_date is not None and len(_r) > 0) else np.nan
+# --- Latest snapshot (safe version) ---
+latest_risk = np.nan
+latest_date = None
+
+rs = pd.Series(risk_smooth).dropna()
+
+if not rs.empty:
+    latest_date = rs.index.max()
+    latest_risk = float(rs.iloc[-1])
 
 # =========================
 # Tabs
